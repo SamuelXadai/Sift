@@ -23,7 +23,7 @@ def parser(code):
         return
     elif code[0] == "if" and len(code) > 0:
         cond = str(code[1])
-        codition = eval(f"{cond}")
+        codition = eval(f"{cond}", data, {"true": True, "false": False})
         if codition == True:
             return
         ifp = True
@@ -50,6 +50,11 @@ def parser(code):
         data[var] = value
     elif lib["extern"]:
         ext.extern(code)
+    elif code[0] == "exit":
+        if len(code) > 1:
+            ret = int(code[1])
+            sys.exit(ret)
+        sys.exit()
     elif code[0] == "end":
         if ifp == True:
             ifp = False
@@ -59,9 +64,7 @@ def parser(code):
             return
         print("ERROR:", " ".join(code), "not exist.")
         sys.exit(1)
-try:
-    for lines in code:
-        parser(lines.lower().strip().split(" ", 1))
-except Exception as e:
-    print(e)
+
+for lines in code:
+    parser(lines.lower().strip().split(" ", 1))
 data.clear()
