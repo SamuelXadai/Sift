@@ -13,6 +13,11 @@ def parser(code):
     global ifp
 
     if len(code) == 0 or ifp == True:
+        if code[0] == "else":
+            if ifp == True:
+                ifp = False
+            else:
+                ifp = True
         return
     
     

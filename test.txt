@@ -1,1 +1,1 @@
-! Tudo está indo bem!
+! esse é só um arquivo teste, onde você pode testar a linguagem.
