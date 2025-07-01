@@ -1,9 +1,9 @@
 import sys
 import libs.math_nash as math
-import libs.extern_nash as ext
+import libs.os_nash as os
 
 data = {}
-lib = {"math": False, "extern": False}
+lib = {"math": False, "os": False}
 ifp = False
 
 with open(sys.argv[1], 'r') as file:
@@ -46,15 +46,15 @@ def parser(code):
     elif code[0] == "use":
         if code[1] == "math":
             lib["math"] = True
-        elif code[1] == "extern":
-            lib["extern"] = True
+        elif code[1] == "os":
+            lib["os"] = True
         else:
             print("ERROR: The library:", "".join(code[1]), "Not exist.")
     elif lib["math"]:
         var, value = math.math(code)
         data[var] = value
-    elif lib["extern"]:
-        ext.extern(code)
+    elif lib["os"]:
+        os.os_commands(code)
     elif code[0] == "exit":
         if len(code) > 1:
             ret = int(code[1])
