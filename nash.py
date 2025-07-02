@@ -1,6 +1,16 @@
 import sys
+import requests as rqt
 import libs.math_nash as math
 import libs.os_nash as os
+
+# final_version = rqt.get("").text
+# print(final_version)
+
+if (sys.argv[1]) == "--version":
+    with open('version.txt', 'r') as file:
+        version = file.read()
+        print(version)
+        sys.exit(0)
 
 data = {}
 lib = {"math": False, "os": False}
