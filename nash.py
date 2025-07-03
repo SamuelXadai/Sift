@@ -3,13 +3,17 @@ import requests as rqt
 import libs.math_nash as math
 import libs.os_nash as os
 
-# final_version = rqt.get("").text
-# print(final_version)
+last_version = rqt.get("https://raw.githubusercontent.com/SamuelXadai/Nash/refs/heads/main/version.txt?token=GHSAT0AAAAAADGP7MYVVJGJSGRZTVJDZ4CG2DG2IHA").text.strip()
 
 if (sys.argv[1]) == "--version":
     with open('version.txt', 'r') as file:
         version = file.read()
-        print(version)
+        if version != last_version:
+            print("New version available!")
+            print(version)
+            print(last_version)
+        else:
+            print(version)
         sys.exit(0)
 
 data = {}
