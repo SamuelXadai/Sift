@@ -1,7 +1,9 @@
 import sys
+import os
+import json
 import requests as rqt
 import libs.math_nash as math
-import libs.os_nash as os
+import libs.os_nash as osn
 
 last_version = rqt.get("https://raw.githubusercontent.com/SamuelXadai/Nash/refs/heads/main/version.txt?token=GHSAT0AAAAAADGP7MYVVJGJSGRZTVJDZ4CG2DG2IHA").text.strip()
 
@@ -11,7 +13,6 @@ if (sys.argv[1]) == "--version":
         if version != last_version:
             print("New version available!")
             print(version)
-            print(last_version)
         else:
             print(version)
         sys.exit(0)
@@ -63,12 +64,18 @@ def parser(code):
         elif code[1] == "os":
             lib["os"] = True
         else:
+            if len(code) == 2 and os.path.exists(f"{code[1]}.json"):
+                with open(f"{code[1]}.json", 'r') as json_file:
+                    lib_json = (json.load(json_file))
+                    lib_json = lib_json.copy()
+                    data.update(lib_json)
+                    return
             print("ERROR: The library:", "".join(code[1]), "Not exist.")
     elif lib["math"]:
         var, value = math.math(code)
         data[var] = value
     elif lib["os"]:
-        os.os_commands(code)
+        osn.os_commands(code)
     elif code[0] == "exit":
         if len(code) > 1:
             ret = int(code[1])

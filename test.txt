@@ -1,1 +1,2 @@
-! esse é só um arquivo teste, onde você pode testar a linguagem.
+use file
+print $a
