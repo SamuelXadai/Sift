@@ -1,2 +1,1 @@
-use file
-print $a
+! É apenas um arquivo de teste.

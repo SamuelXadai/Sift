@@ -24,7 +24,7 @@ ifp = False
 with open(sys.argv[1], 'r') as file:
     code = file.readlines()
 
-def parser(code):
+def parser(code, index):
     global ifp
 
     if len(code) == 0 or ifp == True:
@@ -86,11 +86,9 @@ def parser(code):
             ifp = False
         return
     else:
-        if ifp == True:
-            return
-        print("ERROR:", " ".join(code), "not exist.")
+        print(f"ERROR: line {index + 1}:", " ".join(code), "not exist.")
         sys.exit(1)
 
-for lines in code:
-    parser(lines.lower().strip().split(" ", 1))
+for index, lines in enumerate(code):
+    parser(lines.lower().strip().split(" ", 1), index)
 data.clear()
