@@ -18,7 +18,7 @@ if (sys.argv[1]) == "--version":
         sys.exit(0)
 
 data = {}
-lib = {"math": False, "os": False}
+lib = {"math": False, "os": False, "random": False}
 ifp = False
 
 with open(sys.argv[1], 'r') as file:
@@ -38,6 +38,14 @@ def parser(code, index):
     
     if code[0] == "print" and len(code) >= 1:
         value = code[1].strip()
+        if "$array-get" in code[1]:
+            value = value.split(" ")
+            del value[0]
+            if not value[0] in data: return
+            ind = eval(f"{value[1]}")
+            a = data.get(value[0], "ERROR")
+            print(a[ind])
+            return
         print(data.get(value, value))
     elif code[0][0] == "!":
         return
@@ -53,7 +61,15 @@ def parser(code, index):
         var = codee[0]
         value = codee[1]
 
-        if value == "$input":
+        if "$array" in codee[1]:
+            array = "".join(codee[1]).replace("[", "#").replace("]", "#")
+            array = array.split("#")
+            del array[0]
+            array = "".join(array)
+            data[var] = eval(f"[{array}]")
+            return
+        
+        elif value == "$input":
             data[var] = input()
             return
         
@@ -61,8 +77,10 @@ def parser(code, index):
     elif code[0] == "use":
         if code[1] == "math":
             lib["math"] = True
+            return
         elif code[1] == "os":
             lib["os"] = True
+            return
         else:
             if len(code) == 2 and os.path.exists(f"{code[1]}.json"):
                 with open(f"{code[1]}.json", 'r') as json_file:
@@ -71,6 +89,7 @@ def parser(code, index):
                     data.update(lib_json)
                     return
             print("ERROR: The library:", "".join(code[1]), "Not exist.")
+            print(lib)
     elif lib["math"]:
         var, value = math.math(code)
         data[var] = value
