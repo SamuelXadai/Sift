@@ -2,8 +2,8 @@ import sys
 import os
 import json
 import requests as rqt
-import libs.math_nash as math
-import libs.os_nash as osn
+import libs.math_sift as math
+import libs.os_sift as oss
 
 last_version = rqt.get("https://raw.githubusercontent.com/SamuelXadai/Nash/refs/heads/main/version.txt?token=GHSAT0AAAAAADGP7MYVVJGJSGRZTVJDZ4CG2DG2IHA").text.strip()
 
@@ -39,7 +39,8 @@ def parser(code, index):
     if code[0] == "print" and len(code) >= 1:
         value = code[1].strip()
         if "$array-get" in code[1]:
-            value = value.split(" ")
+            value = value.replace("(", "@").replace(")", "@").replace(" ", "@")
+            value = value.split("@")
             del value[0]
             if not value[0] in data: return
             ind = eval(f"{value[1]}")
@@ -68,7 +69,15 @@ def parser(code, index):
             array = "".join(array)
             data[var] = eval(f"[{array}]")
             return
-        
+        elif "$array-get" in code[1]:
+            value = value.replace("(", "@").replace(")", "@").replace(" ", "@")
+            value = value.split("@")
+            del value[0]
+            if not value[0] in data: return
+            ind = eval(f"{value[1]}")
+            a = data.get(value[0], "ERROR")
+            data[var] = data[value[0]][[ind]]
+            return
         elif value == "$input":
             data[var] = input()
             return
@@ -94,7 +103,7 @@ def parser(code, index):
         var, value = math.math(code)
         data[var] = value
     elif lib["os"]:
-        osn.os_commands(code)
+        oss.os_commands(code)
     elif code[0] == "exit":
         if len(code) > 1:
             ret = int(code[1])

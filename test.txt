@@ -1,2 +1,4 @@
 set $a $array[1]
-print $array-get $a 0
+set $b $array-get($a 0)
+print $a
+print $b
