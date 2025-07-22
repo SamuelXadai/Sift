@@ -1,4 +1,3 @@
-set $a $array[1]
-set $b $array-get($a 0)
-print $a
+set $a 90
+set $b $get $a
 print $b

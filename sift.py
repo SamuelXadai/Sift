@@ -35,18 +35,25 @@ def parser(code, index):
                 ifp = True
         return
     
-    
+    for key in data.keys():
+        if "$" in key.lower():
+            pass
+        else:
+            print(f"ERROR: The variable \"{key}\" not have '$'.")
+            sys.exit(1)
+            return
+
+
     if code[0] == "print" and len(code) >= 1:
         value = code[1].strip()
-        if "$array-get" in code[1]:
-            value = value.replace("(", "@").replace(")", "@").replace(" ", "@")
-            value = value.split("@")
-            del value[0]
-            if not value[0] in data: return
-            ind = eval(f"{value[1]}")
-            a = data.get(value[0], "ERROR")
-            print(a[ind])
-            return
+        #if "$array-get" in code[1]:
+        #    value = value.replace("(", "@").replace(")", "@").replace(" ", "@")
+        #    value = value.split("@")
+        #    del value[0]
+        #    if not value[0] in data: return
+        #    ind = eval(f"{value[1]}")
+        #    print(data.get(value[0][ind], "ERROR: The array dont exist."))
+        #    return
         print(data.get(value, value))
     elif code[0][0] == "!":
         return
@@ -61,27 +68,17 @@ def parser(code, index):
         codee = code[1].split(" ")
         var = codee[0]
         value = codee[1]
-
-        if "$array" in codee[1]:
-            array = "".join(codee[1]).replace("[", "#").replace("]", "#")
-            array = array.split("#")
-            del array[0]
-            array = "".join(array)
-            data[var] = eval(f"[{array}]")
-            return
-        elif "$array-get" in code[1]:
-            value = value.replace("(", "@").replace(")", "@").replace(" ", "@")
-            value = value.split("@")
-            del value[0]
-            if not value[0] in data: return
-            ind = eval(f"{value[1]}")
-            a = data.get(value[0], "ERROR")
-            data[var] = data[value[0]][[ind]]
-            return
-        elif value == "$input":
+        if value == "$input":
             data[var] = input()
             return
-        
+        elif value == "$get":
+            value = data.get(codee[2], "<ERROR>")
+            if value == "<ERROR>":
+                print("ERROR: In \"$get\", Check you code")
+                sys.exit(1)
+                return
+            data[var] = value
+            return
         data[var] = value
     elif code[0] == "use":
         if code[1] == "math":

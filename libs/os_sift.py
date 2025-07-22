@@ -14,3 +14,7 @@ def os_commands(code):
             text = codee[1]
             file.write(text)
             return
+    elif code[0] == ("bash" if os.name == "posix" else "batch") and len(code) > 1:
+        command = code[1]
+        os.system(command)
+        return
