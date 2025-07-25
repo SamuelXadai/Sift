@@ -17,7 +17,7 @@ if (sys.argv[1]) == "--version":
             print(version)
         sys.exit(0)
 
-data = {}
+data = {"$true": True, "$false": False}
 lib = {"math": False, "os": False, "random": False}
 ifp = False
 
@@ -54,12 +54,12 @@ def parser(code, index):
         #    ind = eval(f"{value[1]}")
         #    print(data.get(value[0][ind], "ERROR: The array dont exist."))
         #    return
-        print(data.get(value, value))
+        print(data.get(value, eval(f"{value}")))
     elif code[0][0] == "!":
         return
     elif code[0] == "if" and len(code) > 0:
         cond = str(code[1])
-        codition = eval(f"{cond}", data, {"true": True, "false": False})
+        codition = eval(cond.replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})
         if codition == True:
             return
         ifp = True
@@ -79,7 +79,7 @@ def parser(code, index):
                 return
             data[var] = value
             return
-        data[var] = value
+        data[var] = eval(f"{value}")
     elif code[0] == "use":
         if code[1] == "math":
             lib["math"] = True
@@ -95,7 +95,6 @@ def parser(code, index):
                     data.update(lib_json)
                     return
             print("ERROR: The library:", "".join(code[1]), "Not exist.")
-            print(lib)
     elif lib["math"]:
         var, value = math.math(code)
         data[var] = value
@@ -115,5 +114,6 @@ def parser(code, index):
         sys.exit(1)
 
 for index, lines in enumerate(code):
+    lines = lines.replace('"', "\"")
     parser(lines.lower().strip().split(" ", 1), index)
 data.clear()
