@@ -1,24 +1,18 @@
 import sys
 import os
 import json
-import requests as rqt
+#import requests as rqt
 import libs.math_sift as math
 import libs.os_sift as oss
-
-last_version = rqt.get("https://raw.githubusercontent.com/SamuelXadai/Nash/refs/heads/main/version.txt?token=GHSAT0AAAAAADGP7MYVVJGJSGRZTVJDZ4CG2DG2IHA").text.strip()
 
 if (sys.argv[1]) == "--version":
     with open('version.txt', 'r') as file:
         version = file.read()
-        if version != last_version:
-            print("New version available!")
-            print(version)
-        else:
-            print(version)
+        print(version)
         sys.exit(0)
 
 data = {"$true": True, "$false": False}
-lib = {"math": False, "os": False, "random": False}
+lib = {"math": False, "os": False}
 ifp = False
 
 with open(sys.argv[1], 'r') as file:
