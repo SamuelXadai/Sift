@@ -63,4 +63,10 @@ In '.json' file:
 # Note:
 All commands can be written in upper or lower case.
 
+# How to run Sift?
+## First, you need to install: 
+Debian/Ubuntu: 
+'sudo apt install ./sift-amd64.deb'
+To run use: 'sift <filename>.sift'
+
 # Thank for read!
