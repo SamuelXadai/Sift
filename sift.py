@@ -40,15 +40,7 @@ def parser(code, index):
 
     if code[0] == "print" and len(code) >= 1:
         value = code[1].strip()
-        #if "$array-get" in code[1]:
-        #    value = value.replace("(", "@").replace(")", "@").replace(" ", "@")
-        #    value = value.split("@")
-        #    del value[0]
-        #    if not value[0] in data: return
-        #    ind = eval(f"{value[1]}")
-        #    print(data.get(value[0][ind], "ERROR: The array dont exist."))
-        #    return
-        print(data.get(value, eval(f"{value}")))
+        print(data.get(value, eval(value.replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})))
     elif code[0][0] == "!":
         return
     elif code[0] == "if" and len(code) > 0:
@@ -58,10 +50,21 @@ def parser(code, index):
             return
         ifp = True
         return
-    elif code[0] == "set" and len(code) > 1:
-        codee = code[1].split(" ")
-        var = codee[0]
-        value = codee[1]
+    elif code[0][0] == "$" and len(code) > 1:
+        var = code[0].strip()
+        value = code[1].strip()
+        if value.startswith("="):
+            pass
+        elif var.endswith("="):
+            if value.startswith("="):
+                print("ERROR: Have two egual.")
+                sys.exit(1)
+            var = var.replace("=", "")
+            data[var] = eval(value.replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})
+            return
+        else:
+            print("ERROR: vasco!")
+            sys.exit(1)
         if value == "$input":
             data[var] = input()
             return
@@ -73,7 +76,7 @@ def parser(code, index):
                 return
             data[var] = value
             return
-        data[var] = eval(f"{value}")
+        data[var] = eval(value[1:].replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})
     elif code[0] == "use":
         if code[1] == "math":
             lib["math"] = True

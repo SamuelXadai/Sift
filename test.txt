@@ -1,3 +1,5 @@
 ! Test you code here!
 ! Exemple:
 print "Hello World!"
+$a= "oii"
+print $a
