@@ -1,27 +1,37 @@
 import sys
 import os
 import json
-#import requests as rqt
+import requests as rqt
+import configparser as cfgini
 import libs.math_sift as math
 import libs.os_sift as oss
+
+# é o link do version.txt
+#https://raw.githubusercontent.com/SamuelXadai/Sift/refs/heads/main/version.txt
 
 if (sys.argv[1]) == "--version":
     with open('version.txt', 'r') as file:
         version = file.read()
+        last_version = rqt.get('https://raw.githubusercontent.com/SamuelXadai/Sift/refs/heads/main/version.txt').text.strip()
+        if not version.__eq__(last_version):
+            print("NEW Version! is {}".format(last_version))
         print(version)
         sys.exit(0)
 
 data = {"$true": True, "$false": False}
 lib = {"math": False, "os": False}
+f_stack = {}
+falloc = False
+function_name = None
 ifp = False
 
 with open(sys.argv[1], 'r') as file:
     code = file.readlines()
 
 def parser(code, index):
-    global ifp
+    global ifp, falloc, function_name
 
-    if len(code) == 0 or ifp == True:
+    if len(code[0]) == 1 or ifp:
         if code[0] == "else":
             if ifp == True:
                 ifp = False
@@ -37,11 +47,20 @@ def parser(code, index):
             sys.exit(1)
             return
 
-
+    if falloc and code[0]:
+        if code[0] == "end":
+            falloc = False
+            return
+        if code[0] == "":
+            return
+        all_line = " ".join(code)
+        f_stack[function_name].append(all_line)
+        return
+    
     if code[0] == "print" and len(code) >= 1:
         value = code[1].strip()
         print(data.get(value, eval(value.replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})))
-    elif code[0][0] == "!":
+    elif code[0].startswith("!"):
         return
     elif code[0] == "if" and len(code) > 0:
         cond = str(code[1])
@@ -50,7 +69,7 @@ def parser(code, index):
             return
         ifp = True
         return
-    elif code[0][0] == "$" and len(code) > 1:
+    elif code[0].startswith("$") and len(code) > 1:
         var = code[0].strip()
         value = code[1].strip()
         if value.startswith("="):
@@ -63,7 +82,7 @@ def parser(code, index):
             data[var] = eval(value.replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})
             return
         else:
-            print("ERROR: vasco!")
+            print("ERROR: Not have equal.")
             sys.exit(1)
         if value == "$input":
             data[var] = input()
@@ -77,6 +96,14 @@ def parser(code, index):
             data[var] = value
             return
         data[var] = eval(value[1:].replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})
+    elif code[0] == "func" and len(code) > 1:
+        function_name = code[1]
+        if not function_name in f_stack.keys():
+            f_stack[function_name] = []
+            falloc = [True, function_name]
+            return
+        print("ERROR: The function {} alreready exist.".format(function_name))
+        sys.exit(1)
     elif code[0] == "use":
         if code[1] == "math":
             lib["math"] = True
@@ -105,7 +132,19 @@ def parser(code, index):
     elif code[0] == "end":
         if ifp == True:
             ifp = False
+        elif falloc:
+            falloc = False
         return
+    elif code[0] in f_stack.keys():
+        func = code[0]
+        for i in f_stack.keys():
+            if i == func:
+                for e in range(len(f_stack[func])):
+                    commands = "".join(f_stack[func][e])
+                    parser(commands.lower().strip().split(" ", 1), index)
+                    continue
+            else:
+                continue
     else:
         print(f"ERROR: line {index + 1}:", " ".join(code), "not exist.")
         sys.exit(1)
@@ -113,4 +152,5 @@ def parser(code, index):
 for index, lines in enumerate(code):
     lines = lines.replace('"', "\"")
     parser(lines.lower().strip().split(" ", 1), index)
+f_stack.clear()
 data.clear()

@@ -1,5 +1,11 @@
-! Test you code here!
-! Exemple:
-print "Hello World!"
-$a= "oii"
-print $a
+func main
+print "oi mundo!"
+print "e aí, consegui?"
+end
+
+func test
+print "oi denovo"
+end
+
+test
+main
