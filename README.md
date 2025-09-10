@@ -7,15 +7,17 @@ Sift is a new programming language. that "filters" the complexities, leaving the
 ### Basic commands:
 
 To display a data output:
-	`print "Hello World!"`
+	`print "Hello World!"` | `print 21`
+	or:
+	`print "Thank " "You"` | `print "Thank" " " "You"` | `print "number: " 20 + 10`
 To comment use:
 	`! This is a comment.`
 To store values (Variables):
-	`set $var 2025`
-	`set $var "String"`
-	`set $var $true` ou `$false`
+	`$var = 2025`
+	`$var = "String"`
+	`$var = $true` ou `$false`
 To receive a data entry:
-	`set $var $input`
+	`$var = $input`
 To exit the program:
 	`exit` or `exit <number>`
 
@@ -54,12 +56,15 @@ To use OS library: `use os`
 
 #### JSON:
 To use '.json' files, to create variables. Just write his name, Example:
-`use json_file`
+`use json json_file`
 In '.json' file:
 `{`
 `    "$value": 90`
 `}`
 
+# Functions:
+* Use: `func main` (or other name to function)
+* To use this function use: `main`
 # Note:
 All commands can be written in upper or lower case.
 
