@@ -1,11 +1,5 @@
-func main
-print "oi mundo!"
-print "e aí, consegui?"
-end
-
-func test
-print "oi denovo"
-end
-
-test
-main
+! Test you code:
+! example:
+print "Hello World!"
+! Other example:
+print "Thank " "You " "For Test!"

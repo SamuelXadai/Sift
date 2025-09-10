@@ -1,13 +1,13 @@
 import sys
 import os
 import json
+import re
 import requests as rqt
-import configparser as cfgini
 import libs.math_sift as math
 import libs.os_sift as oss
 
 # é o link do version.txt
-#https://raw.githubusercontent.com/SamuelXadai/Sift/refs/heads/main/version.txt
+# https://raw.githubusercontent.com/SamuelXadai/Sift/refs/heads/main/version.txt
 
 if (sys.argv[1]) == "--version":
     with open('version.txt', 'r') as file:
@@ -25,11 +25,22 @@ falloc = False
 function_name = None
 ifp = False
 
-with open(sys.argv[1], 'r') as file:
-    code = file.readlines()
+# CALL
+COMMAND_LINE = False
+
+if (sys.argv[1]) == "-c":
+    COMMAND_LINE = True
+    if not len(sys.argv) > 1:
+        print("ERROR: COMMAND_LINE")
+        sys.exit(1)
+    code = " ".join((sys.argv[2:]))
+
+if COMMAND_LINE == False:
+    with open(sys.argv[1], 'r') as file:
+        code = file.readlines()
 
 def parser(code, index):
-    global ifp, falloc, function_name
+    global ifp, falloc, function_name, data
 
     if len(code[0]) == 1 or ifp:
         if code[0] == "else":
@@ -47,11 +58,9 @@ def parser(code, index):
             sys.exit(1)
             return
 
-    if falloc and code[0]:
-        if code[0] == "end":
+    if falloc:
+        if code[0] == "end".lower():
             falloc = False
-            return
-        if code[0] == "":
             return
         all_line = " ".join(code)
         f_stack[function_name].append(all_line)
@@ -59,10 +68,20 @@ def parser(code, index):
     
     if code[0] == "print" and len(code) >= 1:
         value = code[1].strip()
-        print(data.get(value, eval(value.replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})))
+        if '"' in value:
+            value_str = re.findall(r'"(.*?)"', value)
+            value = re.sub(r'"(.*?)"', "", value).strip()
+
+        print("".join(value_str).strip())
+        print(eval(value.replace("$", ""), 
+        {key.replace("$", ""): valor for key, valor in data.items()}) if len(value) > 0 else "".strip())
+        return
     elif code[0].startswith("!"):
         return
     elif code[0] == "if" and len(code) > 0:
+        if COMMAND_LINE:
+            print("ERROR: 'if' not is possible.")
+            return
         cond = str(code[1])
         codition = eval(cond.replace("$", ""), {key.replace("$", ""): valor for key, valor in data.items()})
         if codition == True:
@@ -70,6 +89,9 @@ def parser(code, index):
         ifp = True
         return
     elif code[0].startswith("$") and len(code) > 1:
+        if COMMAND_LINE:
+            print("ERROR: Variables not is possible.")
+            return
         var = code[0].strip()
         value = code[1].strip()
         if value.startswith("="):
@@ -105,20 +127,24 @@ def parser(code, index):
         print("ERROR: The function {} alreready exist.".format(function_name))
         sys.exit(1)
     elif code[0] == "use":
+        codee = code[1].strip().split(" ", 1)
         if code[1] == "math":
             lib["math"] = True
             return
         elif code[1] == "os":
             lib["os"] = True
             return
-        else:
-            if len(code) == 2 and os.path.exists(f"{code[1]}.json"):
-                with open(f"{code[1]}.json", 'r') as json_file:
+        elif codee[0] == "json":
+            if len(code) == 2 and os.path.exists(f"{codee[1]}.json"):
+                with open(f"{codee[1]}.json", 'r') as json_file:
                     lib_json = (json.load(json_file))
                     lib_json = lib_json.copy()
                     data.update(lib_json)
                     return
-            print("ERROR: The library:", "".join(code[1]), "Not exist.")
+                pass
+        else:
+            print("ERROR: The library {} not exist.".format(code[1]))
+            return
     elif lib["math"]:
         var, value = math.math(code)
         data[var] = value
@@ -141,16 +167,28 @@ def parser(code, index):
             if i == func:
                 for e in range(len(f_stack[func])):
                     commands = "".join(f_stack[func][e])
+                    commands = commands.replace('"', "")
                     parser(commands.lower().strip().split(" ", 1), index)
                     continue
             else:
                 continue
     else:
-        print(f"ERROR: line {index + 1}:", " ".join(code), "not exist.")
+        if COMMAND_LINE and index == 1000:
+            print("ERROR: COMMAND_LINE error: {} command not exist".format(" ".join(code)))
+            sys.exit(1)
+        temp = "".join(code[0]).strip()
+        if len(temp) < 1:
+            return
+        print(f"ERROR: line {index + 1}:", " ".join(code), "command not exist.")
         sys.exit(1)
 
-for index, lines in enumerate(code):
-    lines = lines.replace('"', "\"")
-    parser(lines.lower().strip().split(" ", 1), index)
+if COMMAND_LINE == False:
+    for index, lines in enumerate(code):
+        lines = lines.replace('"', "\"")
+        parser(lines.lower().strip().split(" ", 1), index)
+else:
+    code = code.replace('"', "\"")
+    parser(code.lower().strip().split(" ", 1), 1000)
+
 f_stack.clear()
 data.clear()
