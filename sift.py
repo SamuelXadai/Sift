@@ -17,6 +17,7 @@ if (sys.argv[1]) == "--version":
         print(version)
         sys.exit(0)
     print(version)
+    sys.exit(0)
 
 data = {"$true": True, "$false": False}
 lib = {"math": False, "os": False}
