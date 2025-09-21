@@ -8,15 +8,15 @@ import libs.os_sift as oss
 
 # é o link do version.txt
 # https://raw.githubusercontent.com/SamuelXadai/Sift/refs/heads/main/version.txt
+version = "SIFT: 1.1"
 
 if (sys.argv[1]) == "--version":
-    with open('version.txt', 'r') as file:
-        version = file.read()
-        last_version = rqt.get('https://raw.githubusercontent.com/SamuelXadai/Sift/refs/heads/main/version.txt').text.strip()
-        if not version.__eq__(last_version):
-            print("NEW Version! is {}".format(last_version))
+    last_version = rqt.get("https://raw.githubusercontent.com/SamuelXadai/Sift/refs/heads/main/version.txt").text.strip()
+    if not version == last_version:
+        print("New version! See https://github.com/SamuelXadai/Sift")
         print(version)
         sys.exit(0)
+    print(version)
 
 data = {"$true": True, "$false": False}
 lib = {"math": False, "os": False}
